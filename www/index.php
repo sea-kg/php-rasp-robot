@@ -5,7 +5,7 @@
 		$(document).ready(function(){
 			setInterval(function(){
 				image1.src="webcam.php?t=" + Date.now();
-			}, 2000);
+			}, 1000);
 		});
 	</script>
 </head>
