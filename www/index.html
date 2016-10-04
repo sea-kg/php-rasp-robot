@@ -9,7 +9,7 @@
 		});*/
 		
 		var type = "";
-		
+		var connected = false;
 		$(document).keydown(function(e){
 			// console.log("keydown ", e.keyCode);
 			if(e.keyCode == 38){
@@ -32,61 +32,107 @@
 		
 		
 		setInterval(function(){
+			if(connected == false)
+				return;
+
 			if(type == "forward"){
 				$('#forward_').show();
+				drive("forward");
 			}else{
 				$('#forward_').hide();
 			}
 			
 			if(type == "backward"){
 				$('#backward_').show();
+				drive("backward");
 			}else{
 				$('#backward_').hide();
 			}
 			
 			if(type == "turnleft"){
 				$('#turnleft_').show();
+				drive("turnleft");
 			}else{
 				$('#turnleft_').hide();
 			}
 			
 			if(type == "turnright"){
 				$('#turnright_').show();
+				drive("turnright");
 			}else{
 				$('#turnright_').hide();
 			}
 			
 		}, 200);
 		
+		function takevideo0(){
+			window.socket.send(JSON.stringify({'cmd':'takevideo0'}));
+		}
 		
-/*		kinput.onkeydown = kinput.onkeyup = kinput.onkeypress = handle;
+		function drive(cmd){
+			window.socket.send(JSON.stringify({'cmd':cmd}));
+		}
+		
+		setInterval(function(){
+			if(connected == false)
+				return;
+			takevideo0();
+		}, 200);
+		
+		$(document).ready(function(){
+			$('#connect').click(function(){
+				$('#connectionform').hide();
+				$('#status').show();
+				window.socket = new WebSocket($('#address_ws').val());
+				window.socket.onopen = function() {
+					$('#status').hide();
+					$('#webcam').show();
+					connected = true;
+					takevideo0();
+				};
 
-var lastTime = Date.now();
+				window.socket.onclose = function(event) {
+					$('#status').hide();
+					$('#webcam').hide();
+					$('#connectionform').show();
+					
+					if (event.wasClean) {
+						console.log('Disconnected');
+					} else {
+						console.log('Connection refused');
+					}
+					console.log('Code: ' + event.code + ' Reason: ' + event.reason);
+					connected = false;
+				};
 
-function handle(e) {
-  if (form.elements[e.type + 'Ignore'].checked) return;
+				window.socket.onmessage = function(event) {
+					
+					if(event.data instanceof Blob){
+						
+						/*var ctx = document.getElementById('canvas').getContext('2d');
+						var img = new Image;
+						img.onload = function() {
+							ctx.drawImage(img, 20,20);
+							alert('the image is drawn');
+						}
+						img.src = URL.createObjectURL(e.target.files[0]);*/
 
-  var text = e.type +
-    ' keyCode=' + e.keyCode +
-    ' which=' + e.which +
-    ' charCode=' + e.charCode +
-    ' char=' + String.fromCharCode(e.keyCode || e.charCode) +
-    (e.shiftKey ? ' +shift' : '') +
-    (e.ctrlKey ? ' +ctrl' : '') +
-    (e.altKey ? ' +alt' : '') +
-    (e.metaKey ? ' +meta' : '') + "\n";
+						$('#webcam').attr({'src' : URL.createObjectURL(event.data)})
+					}else{
+						console.log("Recieved data " + event.data);
+					}
+					
+				};
 
-  if (area.value && Date.now() - lastTime > 250) {
-    area.value += new Array(81).join('-') + '\n';
-  }
-  lastTime = Date.now();
-
-  area.value += text;
-
-  if (form.elements[e.type + 'Stop'].checked) {
-    e.preventDefault();
-  }
-}*/
+				window.socket.onerror = function(error) {
+					console.log("Error " + error.message);
+					// $('#connectionform').hide();
+					// $('#status').hide();
+					// $('#webcam').hide();
+					// connected = false;
+				};
+			});
+		})
 
 	</script>
 </head>
@@ -102,10 +148,11 @@ function handle(e) {
 		<tr>
 			<td width=100px><img style="display: none" id="turnleft_" height=240px width=100px src="turnleft.png"></td>
 			<td align=center valign=middle>
-				<img id="webcam" style="display: none" height=240px width=320px src="splash.png"><br>
-				<input id="address_ws"/><button>Connect</button>
+				<img id="webcam" style="display: none; border: 1px solid gray;" height=240px width=320px src="splash.png"><br>
+				<div id="connectionform"><input id="address_ws" value="ws://localhost:1234/"/><button id="connect">Connect</button></div>
+				<div id="status" style="display: none; color: white;">Connecting...</div>
 			</td>
-			<td width=100px><img id="turnright_" style="display: none" height=240px width=100px src="turnright.png"></td>
+			<td width=100px><img id="turnright_" style="display: none;" height=240px width=100px src="turnright.png"></td>
 		</tr>
 		<tr height=100px>
 			<td width=100px></td>

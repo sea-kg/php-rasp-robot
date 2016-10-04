@@ -3,5 +3,9 @@
 
 ## configure
 
-	$ sudo chmod 666 /dev/video0
 	$ sudo apt-get install streamer
+
+## Find rasp in network
+
+	$ nmap -sn 192.168.1.1/24
+
