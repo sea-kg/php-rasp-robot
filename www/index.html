@@ -1,0 +1,119 @@
+<html>
+<head>
+	<script type="text/javascript" src="jquery-3.1.0.min.js"></script>
+	<script>
+		/*$(document).ready(function(){
+			setInterval(function(){
+				image1.src="webcam.php?t=" + Date.now();
+			}, 1000);
+		});*/
+		
+		var type = "";
+		
+		$(document).keydown(function(e){
+			// console.log("keydown ", e.keyCode);
+			if(e.keyCode == 38){
+				type = "forward";
+			}else if(e.keyCode == 40){
+				type = "backward";
+			}else if(e.keyCode == 37){
+				type = "turnleft";
+			}else if(e.keyCode == 39){
+				type = "turnright";
+			}else{
+				type = "";
+			}
+		});
+		
+		$(document).keyup(function(e){
+			// console.log("keyup ", e.keyCode);
+			type = "";
+		});
+		
+		
+		setInterval(function(){
+			if(type == "forward"){
+				$('#forward_').show();
+			}else{
+				$('#forward_').hide();
+			}
+			
+			if(type == "backward"){
+				$('#backward_').show();
+			}else{
+				$('#backward_').hide();
+			}
+			
+			if(type == "turnleft"){
+				$('#turnleft_').show();
+			}else{
+				$('#turnleft_').hide();
+			}
+			
+			if(type == "turnright"){
+				$('#turnright_').show();
+			}else{
+				$('#turnright_').hide();
+			}
+			
+		}, 200);
+		
+		
+/*		kinput.onkeydown = kinput.onkeyup = kinput.onkeypress = handle;
+
+var lastTime = Date.now();
+
+function handle(e) {
+  if (form.elements[e.type + 'Ignore'].checked) return;
+
+  var text = e.type +
+    ' keyCode=' + e.keyCode +
+    ' which=' + e.which +
+    ' charCode=' + e.charCode +
+    ' char=' + String.fromCharCode(e.keyCode || e.charCode) +
+    (e.shiftKey ? ' +shift' : '') +
+    (e.ctrlKey ? ' +ctrl' : '') +
+    (e.altKey ? ' +alt' : '') +
+    (e.metaKey ? ' +meta' : '') + "\n";
+
+  if (area.value && Date.now() - lastTime > 250) {
+    area.value += new Array(81).join('-') + '\n';
+  }
+  lastTime = Date.now();
+
+  area.value += text;
+
+  if (form.elements[e.type + 'Stop'].checked) {
+    e.preventDefault();
+  }
+}*/
+
+	</script>
+</head>
+<body style="padding: 0px; margin: 0px;">
+	<table width=100% height=100% bgcolor="black">
+		<tr height=100px>
+			<td width=100px></td>
+			<td align=center valign=middle>
+				<img id="forward_" style="display: none" height=100px width=320px src="forward.png">
+			</td>
+			<td width=100px></td>
+		</tr>
+		<tr>
+			<td width=100px><img style="display: none" id="turnleft_" height=240px width=100px src="turnleft.png"></td>
+			<td align=center valign=middle>
+				<img id="webcam" style="display: none" height=240px width=320px src="splash.png"><br>
+				<input id="address_ws"/><button>Connect</button>
+			</td>
+			<td width=100px><img id="turnright_" style="display: none" height=240px width=100px src="turnright.png"></td>
+		</tr>
+		<tr height=100px>
+			<td width=100px></td>
+			<td align=center valign=middle>
+				<img id="backward_" style="display: none" height=100px width=320px src="backward.png">
+			</td>
+			<td width=100px></td>
+		</tr>
+	</table>
+</body>
+</html>
