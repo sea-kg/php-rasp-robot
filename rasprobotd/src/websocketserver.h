@@ -20,12 +20,14 @@ class WebSocketServer : public QObject, public IWebSocketServer {
 		explicit WebSocketServer(quint16 port, bool debug = false, QObject *parent = Q_NULLPTR);
 		~WebSocketServer();
 
-		virtual void sendMessage(QWebSocket *pClient, QString message);
-		virtual int getConnectedUsers();
 		virtual void sendMessage(QWebSocket *pClient, QJsonObject obj);
 		virtual void sendMessage(QWebSocket *pClient, const QByteArray &data);
-		// virtual FHQSettings *settings();
-		
+		virtual void turnleft();
+		virtual void turnright();
+		virtual void forward();
+		virtual void backward();
+		virtual void stop();
+				
 	Q_SIGNALS:
 		void closed();
 
@@ -36,10 +38,18 @@ class WebSocketServer : public QObject, public IWebSocketServer {
 		void socketDisconnected();
 
 	private:
+		void unexportPin(int pin);
+		void exportPin(int pin);
+		void setPinValue(int pin, int value);
+		
 		QWebSocketServer *m_pWebSocketServer;
 		QList<QWebSocket *> m_clients;
 		QMap<QString, ICmdHandler *> m_mapCmdHandlers;
 		bool m_debug;
+		int mPinA1;
+		int mPinA2;
+		int mPinB1;
+		int mPinB2;
 };
 
 #endif //WEBSOCKETSERVER_H

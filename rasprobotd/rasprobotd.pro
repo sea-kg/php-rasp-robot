@@ -18,6 +18,7 @@ SOURCES += \
 	src/cmd_handlers/cmd_backward_handler.cpp \
 	src/cmd_handlers/cmd_turnleft_handler.cpp \
 	src/cmd_handlers/cmd_turnright_handler.cpp \
+	src/cmd_handlers/cmd_stop_handler.cpp \
 	src/cmd_handlers/create_cmd_handlers.cpp \
 	src/cmd_handlers/cmd_takevideo0_handler.cpp \
 
@@ -30,4 +31,5 @@ HEADERS += \
 	src/cmd_handlers/cmd_backward_handler.h \
 	src/cmd_handlers/cmd_turnleft_handler.h \
 	src/cmd_handlers/cmd_turnright_handler.h \
+	src/cmd_handlers/cmd_stop_handler.h \
 	src/cmd_handlers/cmd_takevideo0_handler.h \

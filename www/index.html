@@ -8,7 +8,7 @@
 			}, 1000);
 		});*/
 		
-		var type = "";
+		var type = "stop";
 		var connected = false;
 		$(document).keydown(function(e){
 			// console.log("keydown ", e.keyCode);
@@ -21,16 +21,15 @@
 			}else if(e.keyCode == 39){
 				type = "turnright";
 			}else{
-				type = "";
+				type = "stop";
 			}
 		});
 		
 		$(document).keyup(function(e){
 			// console.log("keyup ", e.keyCode);
-			type = "";
+			type = "stop";
 		});
-		
-		
+
 		setInterval(function(){
 			if(connected == false)
 				return;
@@ -63,21 +62,43 @@
 				$('#turnright_').hide();
 			}
 			
+			if(type == "stop"){
+				stop();
+			}
+			
 		}, 200);
 		
 		function takevideo0(){
+			if(connected == false)
+				return;
 			window.socket.send(JSON.stringify({'cmd':'takevideo0'}));
 		}
 		
+		var lastSendedCommand = ''; 
+		
 		function drive(cmd){
-			window.socket.send(JSON.stringify({'cmd':cmd}));
+			if(connected == false)
+				return;
+			if(lastSendedCommand != cmd){
+				lastSendedCommand = cmd;
+				window.socket.send(JSON.stringify({'cmd':cmd}));
+			}
+		}
+		
+		function stop(){
+			if(connected == false)
+				return;
+			if(lastSendedCommand != 'stop'){
+				lastSendedCommand = 'stop';
+				window.socket.send(JSON.stringify({'cmd':'stop'}));
+			}
 		}
 		
 		setInterval(function(){
 			if(connected == false)
 				return;
 			takevideo0();
-		}, 200);
+		}, 2000);
 		
 		$(document).ready(function(){
 			$('#connect').click(function(){
@@ -148,7 +169,7 @@
 		<tr>
 			<td width=100px><img style="display: none" id="turnleft_" height=240px width=100px src="turnleft.png"></td>
 			<td align=center valign=middle>
-				<img id="webcam" style="display: none; border: 1px solid gray;" height=240px width=320px src="splash.png"><br>
+				<img id="webcam" style="display: none; border: 1px solid gray;" width=640px height=480px src="splash.png"><br>
 				<div id="connectionform"><input id="address_ws" value="ws://localhost:1234/"/><button id="connect">Connect</button></div>
 				<div id="status" style="display: none; color: white;">Connecting...</div>
 			</td>

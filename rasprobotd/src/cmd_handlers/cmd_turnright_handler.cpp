@@ -4,9 +4,10 @@ QString CmdTurnrightHandler::cmd(){
 	return "turnright";
 }
 
-void CmdTurnrightHandler::handle(QWebSocket *pClient, IWebSocketServer *pWebSocketServer, QJsonObject obj){
-	/*QJsonObject jsonData;
-	jsonData["cmd"] = QJsonValue(cmd());
-	jsonData["connectedusers"] = pWebSocketServer->getConnectedUsers();
-	pWebSocketServer->sendMessage(pClient, jsonData);*/
+void CmdTurnrightHandler::handle(QWebSocket */*pClient*/, IWebSocketServer *pWebSocketServer, QJsonObject /*obj*/){
+	// QJsonObject jsonData;
+	// jsonData["cmd"] = QJsonValue(cmd());
+	// jsonData["result"] = "OK";
+	// pWebSocketServer->sendMessage(pClient, jsonData);
+	pWebSocketServer->turnright();
 }

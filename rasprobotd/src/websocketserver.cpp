@@ -5,7 +5,7 @@
 #include <QDateTime>
 #include <QHostAddress>
 #include "cmd_handlers/create_cmd_handlers.h"
-
+#include <QProcess>
 
 // QT_USE_NAMESPACE
 
@@ -22,6 +22,21 @@ WebSocketServer::WebSocketServer(quint16 port, bool debug, QObject *parent) : QO
         connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &WebSocketServer::closed);
         create_cmd_handlers(m_mapCmdHandlers);
     }
+
+    mPinA1 = 18;
+	mPinA2 = 17;
+	mPinB1 = 23;
+	mPinB2 = 22;
+
+	unexportPin(mPinA1);
+	unexportPin(mPinA2);
+	unexportPin(mPinB1);
+	unexportPin(mPinB2);
+
+    exportPin(mPinA1);
+	exportPin(mPinA2);
+	exportPin(mPinB1);
+	exportPin(mPinB2);
 }
 
 // ---------------------------------------------------------------------
@@ -57,7 +72,9 @@ void WebSocketServer::processTextMessage(QString message) {
 	if(jsonData.contains("cmd")){
 		cmd = jsonData["cmd"].toString();
 	}else{
-		this->sendMessage(pClient, QString("Invalid command format"));
+		QJsonObject obj;
+		obj["error"] = "Invalid command format";
+		this->sendMessage(pClient, obj);
 	}
     if (m_debug){
 		if(cmd != "takevideo0")
@@ -68,7 +85,9 @@ void WebSocketServer::processTextMessage(QString message) {
 		m_mapCmdHandlers[cmd]->handle(pClient, this, jsonData);
 	}else{
 		qDebug() << "Unknown command: " << cmd;
-		this->sendMessage(pClient, QString("Unknown command"));
+		QJsonObject obj;
+		obj["error"] = "Unknown command";
+		this->sendMessage(pClient, obj);
 	}
 }
 
@@ -94,21 +113,7 @@ void WebSocketServer::socketDisconnected() {
         pClient->deleteLater();
     }
 }
-
-// ---------------------------------------------------------------------
-
-void WebSocketServer::sendMessage(QWebSocket *pClient, QString message){
-	if (pClient) {
-		pClient->sendTextMessage(message);
-	}
-}
 	
-// ---------------------------------------------------------------------
-
-int WebSocketServer::getConnectedUsers(){
-	return m_clients.length();
-}
-
 // ---------------------------------------------------------------------
 
 void WebSocketServer::sendMessage(QWebSocket *pClient, QJsonObject obj){
@@ -128,3 +133,80 @@ void WebSocketServer::sendMessage(QWebSocket *pClient, const QByteArray &data){
         pClient->sendBinaryMessage(data);
     }
 }
+
+// ---------------------------------------------------------------------
+
+void WebSocketServer::turnleft(){
+	setPinValue(mPinA1, 0);
+	setPinValue(mPinA2, 0);
+	setPinValue(mPinB1, 1);
+	setPinValue(mPinB2, 1);
+}
+
+// ---------------------------------------------------------------------
+
+void WebSocketServer::turnright(){
+	setPinValue(mPinA1, 1);
+	setPinValue(mPinA2, 1);
+	setPinValue(mPinB1, 0);
+	setPinValue(mPinB2, 0);
+}
+
+// ---------------------------------------------------------------------
+
+void WebSocketServer::forward(){
+	setPinValue(mPinA1, 0);
+	setPinValue(mPinA2, 1);
+	setPinValue(mPinB1, 1);
+	setPinValue(mPinB2, 0);
+}
+
+// ---------------------------------------------------------------------
+
+void WebSocketServer::backward(){
+	setPinValue(mPinA1, 1);
+	setPinValue(mPinA2, 0);
+	setPinValue(mPinB1, 0);
+	setPinValue(mPinB2, 1);
+}
+
+// ---------------------------------------------------------------------
+
+void WebSocketServer::stop(){
+	setPinValue(mPinA1, 0);
+	setPinValue(mPinA2, 0);
+	setPinValue(mPinB1, 0);
+	setPinValue(mPinB2, 0);
+}
+
+// ---------------------------------------------------------------------
+
+void WebSocketServer::unexportPin(int pin){
+	QProcess process;
+	process.setProcessChannelMode(QProcess::MergedChannels);
+	process.start(QString("echo " + QString::number(pin) + " > /sys/class/gpio/unexport"));
+	process.waitForFinished();
+	process.close();
+}
+
+// ---------------------------------------------------------------------
+
+void WebSocketServer::exportPin(int pin){
+	QProcess process;
+	process.setProcessChannelMode(QProcess::MergedChannels);
+	process.start(QString("echo " + QString::number(pin) + " > /sys/class/gpio/export"));
+	process.waitForFinished();
+	process.close();
+}
+
+// ---------------------------------------------------------------------
+
+void WebSocketServer::setPinValue(int pin, int value){
+	QProcess process;
+	process.setProcessChannelMode(QProcess::MergedChannels);
+	process.start(QString("echo " + QString::number(value) + " > /sys/class/gpio/gpio" + QString::number(pin) + "/value"));
+	process.waitForFinished();
+	process.close();
+}
+
+// ---------------------------------------------------------------------
