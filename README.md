@@ -50,6 +50,8 @@ You can find this in Internet
 - Размерность: MICRO
 - Материал шестеренок: Металл
 
+![pic](https://raw.githubusercontent.com/sea-kg/rasprobotd/master/images/motor.jpeg)
+
 ### Driver for motors
 
 Example http://www.robototehnika.ru/e-store/catalog/203/1176/
@@ -65,6 +67,8 @@ Example http://www.robototehnika.ru/e-store/catalog/203/1176/
 - Защита от переполюсовки питания
 - Ограничение по току можно обеспечить путем добавления резисторов (в комплект поставки не входят)
 
+![pic](https://raw.githubusercontent.com/sea-kg/rasprobotd/master/images/driver.jpeg)
+
 
 ### power bank (for raspberry)
 
@@ -75,4 +79,6 @@ PB3000 LED (1050 rur)
 
 ### Connection motors to raspberry
 
-todo
+![pic](https://raw.githubusercontent.com/sea-kg/rasprobotd/master/images/rasp_motors.png)
+
+![pic](https://raw.githubusercontent.com/sea-kg/rasprobotd/master/images/raspinfo2.png)
