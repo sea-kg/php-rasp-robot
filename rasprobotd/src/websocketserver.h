@@ -41,7 +41,8 @@ class WebSocketServer : public QObject, public IWebSocketServer {
 		void unexportPin(int pin);
 		void exportPin(int pin);
 		void setPinValue(int pin, int value);
-		
+		void directionOutPin(int pin);
+			
 		QWebSocketServer *m_pWebSocketServer;
 		QList<QWebSocket *> m_clients;
 		QMap<QString, ICmdHandler *> m_mapCmdHandlers;
