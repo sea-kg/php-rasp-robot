@@ -6,6 +6,7 @@
 #include <QHostAddress>
 #include "cmd_handlers/create_cmd_handlers.h"
 #include <QProcess>
+#include <QFile>
 
 // QT_USE_NAMESPACE
 
@@ -187,38 +188,42 @@ void WebSocketServer::stop(){
 // ---------------------------------------------------------------------
 
 void WebSocketServer::unexportPin(int pin){
-	QProcess process;
-	process.start(QString("echo " + QString::number(pin) + " > /sys/class/gpio/unexport"));
-	process.waitForFinished();
-	process.close();
+	QFile file("/sys/class/gpio/unexport");
+	if (file.open(QIODevice::ReadWrite)){
+		QTextStream stream( &file );
+		stream << QString::number(pin) << endl;
+	}
 }
 
 // ---------------------------------------------------------------------
 
 void WebSocketServer::exportPin(int pin){
-	QProcess process;
-	process.start(QString("echo " + QString::number(pin) + " > /sys/class/gpio/export"));
-	process.waitForFinished();
-	process.close();
+	QFile file("/sys/class/gpio/export");
+	if (file.open(QIODevice::ReadWrite)){
+		QTextStream stream( &file );
+		stream << QString::number(pin) << endl;
+	}
 }
 
 // ---------------------------------------------------------------------
 
 void WebSocketServer::setPinValue(int pin, int value){
-	QProcess process;
-	process.start(QString("echo " + QString::number(value) + " > /sys/class/gpio/gpio" + QString::number(pin) + "/value"));
-	process.waitForFinished();
-	process.close();
+	QFile file("/sys/class/gpio/gpio" + QString::number(pin) + "/value");
+	if (file.open(QIODevice::ReadWrite)){
+		QTextStream stream( &file );
+		stream << QString::number(value) << endl;
+	}
 }
 
 // ---------------------------------------------------------------------
 
 
 void WebSocketServer::directionOutPin(int pin){
-	QProcess process;
-	process.start(QString("echo \"out\" > /sys/class/gpio/gpio" + QString::number(pin) + "/direction"));
-	process.waitForFinished();
-	process.close();
+	QFile file("/sys/class/gpio/gpio" + QString::number(pin) + "/direction");
+	if (file.open(QIODevice::ReadWrite)){
+		QTextStream stream( &file );
+		stream << "out" << endl;
+	}
 }
 
 // ---------------------------------------------------------------------
