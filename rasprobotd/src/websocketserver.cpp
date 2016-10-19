@@ -23,7 +23,7 @@ WebSocketServer::WebSocketServer(quint16 port, bool debug, QObject *parent) : QO
         create_cmd_handlers(m_mapCmdHandlers);
     }
 
-    mPinA1 = 18;
+	mPinA1 = 18;
 	mPinA2 = 17;
 	mPinB1 = 23;
 	mPinB2 = 22;
@@ -37,6 +37,11 @@ WebSocketServer::WebSocketServer(quint16 port, bool debug, QObject *parent) : QO
 	exportPin(mPinA2);
 	exportPin(mPinB1);
 	exportPin(mPinB2);
+	
+	directionOutPin(mPinA1);
+	directionOutPin(mPinA2);
+	directionOutPin(mPinB1);
+	directionOutPin(mPinB2);
 }
 
 // ---------------------------------------------------------------------
@@ -183,7 +188,6 @@ void WebSocketServer::stop(){
 
 void WebSocketServer::unexportPin(int pin){
 	QProcess process;
-	process.setProcessChannelMode(QProcess::MergedChannels);
 	process.start(QString("echo " + QString::number(pin) + " > /sys/class/gpio/unexport"));
 	process.waitForFinished();
 	process.close();
@@ -193,7 +197,6 @@ void WebSocketServer::unexportPin(int pin){
 
 void WebSocketServer::exportPin(int pin){
 	QProcess process;
-	process.setProcessChannelMode(QProcess::MergedChannels);
 	process.start(QString("echo " + QString::number(pin) + " > /sys/class/gpio/export"));
 	process.waitForFinished();
 	process.close();
@@ -203,8 +206,17 @@ void WebSocketServer::exportPin(int pin){
 
 void WebSocketServer::setPinValue(int pin, int value){
 	QProcess process;
-	process.setProcessChannelMode(QProcess::MergedChannels);
 	process.start(QString("echo " + QString::number(value) + " > /sys/class/gpio/gpio" + QString::number(pin) + "/value"));
+	process.waitForFinished();
+	process.close();
+}
+
+// ---------------------------------------------------------------------
+
+
+void WebSocketServer::directionOutPin(int pin){
+	QProcess process;
+	process.start(QString("echo \"out\" > /sys/class/gpio/gpio" + QString::number(pin) + "/direction"));
 	process.waitForFinished();
 	process.close();
 }
