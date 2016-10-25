@@ -4,6 +4,10 @@
 # Provides:          freehackquestd
 # Short-Description: Start daemon at boot time
 # Description:       Enable service provided by daemon.
+# Required-­Start:    $remote_fs $syslog $time
+# Required­-Stop:     $remote_fs $syslog $time
+# Should­-Start:      $network $named slapd autofs ypbind nscd nslcd
+# Should-­Stop:       $network $named slapd autofs ypbind nscd nslcd
 ### END INIT INFO
 
 DAEMON_PATH="/usr/bin/rasprobotd"
