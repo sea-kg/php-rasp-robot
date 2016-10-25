@@ -1,13 +1,13 @@
 #!/bin/bash
 
 ### BEGIN INIT INFO
-# Provides:          freehackquestd
+# Provides:          rasprobotd
 # Short-Description: Start daemon at boot time
 # Description:       Enable service provided by daemon.
-# Required-Start:    $remote_fs $syslog $time
-# Required-Stop:     $remote_fs $syslog $time
-# Should-Start:      $network $named slapd autofs ypbind nscd nslcd
-# Should-Stop:       $network $named slapd autofs ypbind nscd nslcd
+# Required-Start:    $remote_fs $syslog $time $network
+# Required-Stop:     $remote_fs $syslog $time $network
+# Should-Start:
+# Should-Stop:
 # Default-Start:
 # Default-Stop:
 ### END INIT INFO
