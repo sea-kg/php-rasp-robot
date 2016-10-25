@@ -10,3 +10,12 @@ This app writed on Qt5 use QWebSocket
 
 	$ qmake
 	$ make
+
+## Configure
+
+	$ sudo ln -s `pwd`/etc/rasprobotd /etc/rasprobotd
+	$ sudo ln -s `pwd`/etc/init.d/rasprobotd /etc/init.d/rasprobotd
+	$ sudo ln -s `pwd`/rasprobotd /usr/bin/rasprobotd
+	$ sudo nano /etc/rasprobotd/conf.ini
+	$ sudo update-rc.d rasprobotd defaults
+	
