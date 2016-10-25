@@ -4,11 +4,11 @@
 # Provides:          rasprobotd
 # Short-Description: Start daemon at boot time
 # Description:       Enable service provided by daemon.
-# Required-Start:    $remote_fs $syslog $time $network
-# Required-Stop:     $remote_fs $syslog $time $network
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
 # Should-Start:
 # Should-Stop:
-# Default-Start:
+# Default-Start:     2 3 4 5
 # Default-Stop:
 ### END INIT INFO
 
