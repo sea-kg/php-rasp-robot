@@ -7,7 +7,6 @@
 #include "cmd_handlers/create_cmd_handlers.h"
 #include <QProcess>
 #include <QFile>
-
 // QT_USE_NAMESPACE
 
 // ---------------------------------------------------------------------
@@ -24,21 +23,21 @@ WebSocketServer::WebSocketServer(quint16 port, bool debug, QObject *parent) : QO
         create_cmd_handlers(m_mapCmdHandlers);
     }
 
-	mPinA1 = 18;
-	mPinA2 = 17;
+	mPinA1 = 17;
+	mPinA2 = 22;
 	mPinB1 = 23;
-	mPinB2 = 22;
+	mPinB2 = 18;
 
 	unexportPin(mPinA1);
 	unexportPin(mPinA2);
 	unexportPin(mPinB1);
 	unexportPin(mPinB2);
 
-    exportPin(mPinA1);
+	exportPin(mPinA1);
 	exportPin(mPinA2);
 	exportPin(mPinB1);
 	exportPin(mPinB2);
-	
+
 	directionOutPin(mPinA1);
 	directionOutPin(mPinA2);
 	directionOutPin(mPinB1);
@@ -119,7 +118,7 @@ void WebSocketServer::socketDisconnected() {
         pClient->deleteLater();
     }
 }
-	
+
 // ---------------------------------------------------------------------
 
 void WebSocketServer::sendMessage(QWebSocket *pClient, QJsonObject obj){
@@ -143,26 +142,27 @@ void WebSocketServer::sendMessage(QWebSocket *pClient, const QByteArray &data){
 // ---------------------------------------------------------------------
 
 void WebSocketServer::turnleft(){
-	setPinValue(mPinA1, 0);
+
+	setPinValue(mPinA1, 1);
 	setPinValue(mPinA2, 0);
-	setPinValue(mPinB1, 1);
+	setPinValue(mPinB1, 0);
 	setPinValue(mPinB2, 1);
 }
 
 // ---------------------------------------------------------------------
 
 void WebSocketServer::turnright(){
-	setPinValue(mPinA1, 1);
+	setPinValue(mPinA1, 0);
 	setPinValue(mPinA2, 1);
-	setPinValue(mPinB1, 0);
+	setPinValue(mPinB1, 1);
 	setPinValue(mPinB2, 0);
 }
 
 // ---------------------------------------------------------------------
 
 void WebSocketServer::forward(){
-	setPinValue(mPinA1, 0);
-	setPinValue(mPinA2, 1);
+	setPinValue(mPinA1, 1);
+	setPinValue(mPinA2, 0);
 	setPinValue(mPinB1, 1);
 	setPinValue(mPinB2, 0);
 }
@@ -170,8 +170,8 @@ void WebSocketServer::forward(){
 // ---------------------------------------------------------------------
 
 void WebSocketServer::backward(){
-	setPinValue(mPinA1, 1);
-	setPinValue(mPinA2, 0);
+	setPinValue(mPinA1, 0);
+	setPinValue(mPinA2, 1);
 	setPinValue(mPinB1, 0);
 	setPinValue(mPinB2, 1);
 }
@@ -212,6 +212,7 @@ void WebSocketServer::setPinValue(int pin, int value){
 	if (file.open(QIODevice::ReadWrite)){
 		QTextStream stream( &file );
 		stream << QString::number(value) << endl;
+		qDebug() << "Set value " << value << " to " << pin;
 	}
 }
 
