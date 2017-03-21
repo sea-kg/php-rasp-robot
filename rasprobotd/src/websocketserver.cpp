@@ -23,10 +23,10 @@ WebSocketServer::WebSocketServer(quint16 port, bool debug, QObject *parent) : QO
         create_cmd_handlers(m_mapCmdHandlers);
     }
 
-	mPinA1 = 17;
-	mPinA2 = 22;
-	mPinB1 = 23;
-	mPinB2 = 18;
+	mPinA1 = 23;
+	mPinA2 = 18;
+	mPinB1 = 14;
+	mPinB2 = 15;
 
 	unexportPin(mPinA1);
 	unexportPin(mPinA2);
@@ -65,6 +65,24 @@ void WebSocketServer::onNewConnection()
     connect(pSocket, &QWebSocket::disconnected, this, &WebSocketServer::socketDisconnected);
 
     m_clients << pSocket;
+    
+    QJsonObject obj;
+    obj["msg"] = "info";
+	obj["version"] = "v201703";
+	obj["firmware"] = 1;
+	obj["name"] = "Infrared eye";
+	// TODO 
+
+	QJsonObject capabilities;
+	capabilities["turnleft"] = true;
+	capabilities["turnright"] = true;
+	capabilities["forward"] = true;
+	capabilities["backward"] = true;
+	capabilities["autocontrol"] = true;
+	capabilities["light"] = false;
+	obj["capabilities"] = capabilities;
+	
+	this->sendMessage(pSocket, obj);
 }
 
 // ---------------------------------------------------------------------
@@ -152,8 +170,8 @@ void WebSocketServer::turnleft(){
 // ---------------------------------------------------------------------
 
 void WebSocketServer::turnright(){
-	setPinValue(mPinA1, 0);
-	setPinValue(mPinA2, 1);
+	setPinValue(mPinA1, 1);
+	setPinValue(mPinA2, 0);
 	setPinValue(mPinB1, 1);
 	setPinValue(mPinB2, 0);
 }
@@ -163,8 +181,8 @@ void WebSocketServer::turnright(){
 void WebSocketServer::forward(){
 	setPinValue(mPinA1, 1);
 	setPinValue(mPinA2, 0);
-	setPinValue(mPinB1, 1);
-	setPinValue(mPinB2, 0);
+	setPinValue(mPinB1, 0);
+	setPinValue(mPinB2, 1);
 }
 
 // ---------------------------------------------------------------------
@@ -172,8 +190,8 @@ void WebSocketServer::forward(){
 void WebSocketServer::backward(){
 	setPinValue(mPinA1, 0);
 	setPinValue(mPinA2, 1);
-	setPinValue(mPinB1, 0);
-	setPinValue(mPinB2, 1);
+	setPinValue(mPinB1, 1);
+	setPinValue(mPinB2, 0);
 }
 
 // ---------------------------------------------------------------------
