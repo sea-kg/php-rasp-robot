@@ -46,14 +46,24 @@
         android:layout_toRightOf="@+id/btn_backward" />
 
     <TextView
-        android:text="Connecting..."
+        android:id="@+id/textView_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textView_status"
-        android:textColor="@android:color/holo_blue_bright"
-        android:textSize="25sp"
-        android:layout_alignParentTop="true"
         android:layout_alignLeft="@+id/btn_left"
+        android:layout_below="@+id/nameofrobot"
         android:singleLine="true"
-        android:textAllCaps="false" />
+        android:text="Connecting..."
+        android:textAllCaps="false"
+        android:textColor="@android:color/background_light"
+        android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/nameofrobot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView_status"
+        android:layout_alignParentTop="true"
+        android:textColor="@android:color/background_light"
+        android:textColorLink="@android:color/background_light"
+        android:textSize="25sp" />
 </RelativeLayout>

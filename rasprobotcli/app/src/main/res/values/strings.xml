@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">rasprobotcli</string>
+    <string name="app_name">rasprobotdcli</string>
+    <string name="search_and_connect">Search and connect</string>
+    <string name="searching">Searching...</string>
 </resources>

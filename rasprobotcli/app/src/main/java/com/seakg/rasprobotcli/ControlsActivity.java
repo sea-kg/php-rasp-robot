@@ -10,20 +10,13 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.firebase.tubesock.WebSocket;
-import com.firebase.tubesock.WebSocketEventHandler;
-import com.firebase.tubesock.WebSocketException;
-import com.firebase.tubesock.WebSocketMessage;
+import com.seakg.rasprobotcli.Controllers.RaspRobotDController;
+import com.seakg.rasprobotcli.Interfaces.RaspRobotDListener;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.concurrent.Semaphore;
-
-public class ControlsActivity extends AppCompatActivity implements WebSocketEventHandler {
+public class ControlsActivity extends AppCompatActivity implements RaspRobotDListener {
     private static final String TAG = ControlsActivity.class.getSimpleName();
     private String mIP = "";
     private TextView mStatus = null;
@@ -31,8 +24,8 @@ public class ControlsActivity extends AppCompatActivity implements WebSocketEven
     private Button mBtnBackward;
     private Button mBtnLeft;
     private Button mBtnRight;
-    private WebSocket mWebSocket;
-    private boolean mOpened = false;
+    private RaspRobotDController mRaspRobotDController = null;
+    private TextView mName = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +33,12 @@ public class ControlsActivity extends AppCompatActivity implements WebSocketEven
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_controls);
         getSupportActionBar().hide();
+        mRaspRobotDController = RaspRobotDController.getInstance();
+        mRaspRobotDController.setListener(this);
 
         Intent intent = getIntent();
         mIP = intent.getStringExtra("ip");
+        mName = (TextView)findViewById(R.id.nameofrobot);
         mStatus = (TextView) findViewById(R.id.textView_status);
         mStatus.setText("Connecting to ws://" + mIP + ":1234/");
 
@@ -56,10 +52,10 @@ public class ControlsActivity extends AppCompatActivity implements WebSocketEven
             public boolean onTouch(View v, MotionEvent event) {
                 int eventaction = event.getAction();
                 if(eventaction == MotionEvent.ACTION_DOWN) {
-                    sendCommand("forward");
+                    mRaspRobotDController.sendCommand("forward");
                     return true;
                 }else if(eventaction == MotionEvent.ACTION_UP){
-                    sendCommand("stop");
+                    mRaspRobotDController.sendCommand("stop");
                 }
                 return false;
             }
@@ -70,10 +66,10 @@ public class ControlsActivity extends AppCompatActivity implements WebSocketEven
             public boolean onTouch(View v, MotionEvent event) {
                 int eventaction = event.getAction();
                 if(eventaction == MotionEvent.ACTION_DOWN) {
-                    sendCommand("backward");
+                    mRaspRobotDController.sendCommand("backward");
                     return true;
                 }else if(eventaction == MotionEvent.ACTION_UP){
-                    sendCommand("stop");
+                    mRaspRobotDController.sendCommand("stop");
                 }
                 return false;
             }
@@ -84,10 +80,10 @@ public class ControlsActivity extends AppCompatActivity implements WebSocketEven
             public boolean onTouch(View v, MotionEvent event) {
                 int eventaction = event.getAction();
                 if(eventaction == MotionEvent.ACTION_DOWN) {
-                    sendCommand("turnleft");
+                    mRaspRobotDController.sendCommand("turnleft");
                     return true;
                 }else if(eventaction == MotionEvent.ACTION_UP){
-                    sendCommand("stop");
+                    mRaspRobotDController.sendCommand("stop");
                 }
                 return false;
             }
@@ -98,38 +94,17 @@ public class ControlsActivity extends AppCompatActivity implements WebSocketEven
             public boolean onTouch(View v, MotionEvent event) {
                 int eventaction = event.getAction();
                 if(eventaction == MotionEvent.ACTION_DOWN) {
-                    sendCommand("turnright");
+                    mRaspRobotDController.sendCommand("turnright");
                     return true;
                 }else if(eventaction == MotionEvent.ACTION_UP){
-                    sendCommand("stop");
+                    mRaspRobotDController.sendCommand("stop");
                 }
                 return false;
             }
         });
 
-        String url1 = "ws://" + mIP + ":1234/";
-        Log.i(TAG, "Try connect to " + url1);
-        URI uri = null;
-        try {
-            uri = new URI(url1);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        mWebSocket = new WebSocket(uri);
-        mWebSocket.setEventHandler(this);
-        mWebSocket.connect();
-    }
+        mRaspRobotDController.connect();
 
-    private void sendCommand(String cmd){
-        Log.i(TAG, "send_command " + cmd);
-        JSONObject jsonCmd = new JSONObject();
-        try {
-            jsonCmd.put("cmd", cmd);
-            if(mOpened)
-                mWebSocket.send(jsonCmd.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     public void updateStatus(final String s){
@@ -142,41 +117,53 @@ public class ControlsActivity extends AppCompatActivity implements WebSocketEven
     }
 
     @Override
-    public void onOpen() {
-        Log.i(TAG, "Opened socket");
-        mOpened = true;
-        updateStatus("Connected to ws://" + mIP + ":1234/");
-        // mWebSocket.close();
-    }
-
-    @Override
-    public void onMessage(WebSocketMessage message) {
-        Log.i(TAG, "Message: " + message);
-    }
-
-    @Override
-    public void onClose() {
-        Log.i(TAG, "Closed socket");
-        updateStatus("Closed connection");
-        mOpened = false;
-    }
-
-    @Override
-    public void onError(WebSocketException e) {
-        updateStatus("Could not connect.");
-        Log.e(TAG, e.getMessage());
-        e.printStackTrace();
-    }
-
-    @Override
-    public void onLogMessage(String msg) {
-        Log.i(TAG, "LogMsg:" + msg);
-    }
-
-    @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if(mOpened)
-            mWebSocket.close();
+        mRaspRobotDController.unsetListener();
+        if(mRaspRobotDController.isConnected()){
+            mRaspRobotDController.disconnect();
+        }
+    }
+
+    @Override
+    public void onGotInformation(final JSONObject obj) {
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String version = "";
+                String name = "";
+                int firmware = 0;
+                try {
+                    if (obj.has("version")) {
+                        version = obj.getString("version");
+                    }
+
+                    if (obj.has("name")) {
+                        name = obj.getString("name");
+                    }
+
+                    if (obj.has("firmware")) {
+                        firmware = obj.getInt("firmware");
+                    }
+
+                }catch(JSONException e){
+                    Log.e(TAG, e.getMessage());
+                    e.printStackTrace();
+                }
+                mName.setText(name + " " + version + " (f: " + firmware + ")");
+            }
+        });
+    }
+
+    @Override
+    public void onConnected() {
+        updateStatus("Connected to ws://" + mRaspRobotDController.getIp() + ":1234/");
+    }
+
+    @Override
+    public void onDisconnected() {
+        updateStatus("Closed connection");
+        finish();
     }
 }
